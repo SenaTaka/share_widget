@@ -34,6 +34,17 @@ final class WorkspaceListViewModel: ObservableObject {
         }
     }
 
+    func pinToWidget(noteID: UUID) {
+        Task {
+            do {
+                _ = try await repository.pinNoteToWidget(noteID: noteID)
+                notes = try await repository.fetchNotes()
+            } catch {
+                errorMessage = error.localizedDescription
+            }
+        }
+    }
+
     func deleteNotes(at offsets: IndexSet) {
         let targets = offsets.compactMap { index in notes.indices.contains(index) ? notes[index] : nil }
         Task {

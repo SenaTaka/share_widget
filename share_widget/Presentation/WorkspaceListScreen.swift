@@ -2,49 +2,66 @@ import SwiftUI
 
 struct WorkspaceListScreen: View {
     @StateObject private var viewModel: WorkspaceListViewModel
+    private let noteRepository: NoteRepository
+    private let widgetBridge: WidgetBridge
     @State private var showingCreateDialog = false
     @State private var newWorkspaceName = ""
     @State private var showingEditDialog = false
     @State private var editingWorkspace: Workspace?
     @State private var editedName = ""
 
-    init(viewModel: @autoclosure @escaping () -> WorkspaceListViewModel) {
+    init(
+        viewModel: @autoclosure @escaping () -> WorkspaceListViewModel,
+        noteRepository: NoteRepository,
+        widgetBridge: WidgetBridge
+    ) {
         _viewModel = StateObject(wrappedValue: viewModel())
+        self.noteRepository = noteRepository
+        self.widgetBridge = widgetBridge
     }
 
     var body: some View {
         NavigationStack {
             List {
                 ForEach(viewModel.workspaces) { workspace in
-                    WorkspaceRow(workspace: workspace)
-                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                            Button(role: .destructive) {
-                                Task {
-                                    await viewModel.deleteWorkspace(id: workspace.id)
-                                }
-                            } label: {
-                                Label("Delete", systemImage: "trash")
+                    NavigationLink {
+                        WorkspaceListView(
+                            viewModel: NoteListViewModel(
+                                repository: noteRepository,
+                                widgetBridge: widgetBridge
+                            )
+                        )
+                    } label: {
+                        WorkspaceRow(workspace: workspace)
+                    }
+                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                        Button(role: .destructive) {
+                            Task {
+                                await viewModel.deleteWorkspace(id: workspace.id)
                             }
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
 
-                            Button {
-                                Task {
-                                    await viewModel.archiveWorkspace(id: workspace.id)
-                                }
-                            } label: {
-                                Label("Archive", systemImage: "archivebox")
+                        Button {
+                            Task {
+                                await viewModel.archiveWorkspace(id: workspace.id)
                             }
-                            .tint(.orange)
+                        } label: {
+                            Label("Archive", systemImage: "archivebox")
                         }
-                        .swipeActions(edge: .leading) {
-                            Button {
-                                editingWorkspace = workspace
-                                editedName = workspace.name
-                                showingEditDialog = true
-                            } label: {
-                                Label("Edit", systemImage: "pencil")
-                            }
-                            .tint(.blue)
+                        .tint(.orange)
+                    }
+                    .swipeActions(edge: .leading) {
+                        Button {
+                            editingWorkspace = workspace
+                            editedName = workspace.name
+                            showingEditDialog = true
+                        } label: {
+                            Label("Edit", systemImage: "pencil")
                         }
+                        .tint(.blue)
+                    }
                 }
             }
             .navigationTitle("Workspaces")
@@ -142,6 +159,9 @@ struct WorkspaceRow: View {
 }
 
 #Preview {
-    WorkspaceListScreen(viewModel: WorkspaceListViewModel(workspaceRepository: InMemoryWorkspaceRepository()))
+    WorkspaceListScreen(
+        viewModel: WorkspaceListViewModel(workspaceRepository: InMemoryWorkspaceRepository()),
+        noteRepository: InMemoryNoteRepository(),
+        widgetBridge: WidgetBridgeNoop()
+    )
 }
-

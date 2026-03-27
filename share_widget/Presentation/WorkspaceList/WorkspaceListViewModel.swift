@@ -6,13 +6,20 @@ final class WorkspaceListViewModel: ObservableObject {
     @Published var errorMessage: String?
 
     let repository: NoteRepository
+    let widgetBridge: WidgetBridge
+    private let refreshWidgetUseCase: RefreshWidgetUseCase
 
-    init(repository: NoteRepository) {
+    init(repository: NoteRepository, widgetBridge: WidgetBridge) {
         self.repository = repository
+        self.widgetBridge = widgetBridge
+        self.refreshWidgetUseCase = RefreshWidgetUseCase(repository: repository, widgetBridge: widgetBridge)
     }
 
     func onAppear() {
-        Task { await refresh() }
+        Task {
+            await refresh()
+            await refreshWidgetUseCase.execute()
+        }
     }
 
     func refresh() async {
@@ -28,6 +35,7 @@ final class WorkspaceListViewModel: ObservableObject {
             do {
                 _ = try await repository.createNote(title: "New Note")
                 notes = try await repository.fetchNotes()
+                await refreshWidgetUseCase.execute()
             } catch {
                 errorMessage = error.localizedDescription
             }
@@ -39,6 +47,7 @@ final class WorkspaceListViewModel: ObservableObject {
             do {
                 _ = try await repository.pinNoteToWidget(noteID: noteID)
                 notes = try await repository.fetchNotes()
+                await refreshWidgetUseCase.execute()
             } catch {
                 errorMessage = error.localizedDescription
             }
@@ -53,6 +62,7 @@ final class WorkspaceListViewModel: ObservableObject {
                     try await repository.delete(noteID: target.id)
                 }
                 notes = try await repository.fetchNotes()
+                await refreshWidgetUseCase.execute()
             } catch {
                 errorMessage = error.localizedDescription
             }

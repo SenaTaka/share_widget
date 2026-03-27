@@ -7,7 +7,13 @@ struct WorkspaceListView: View {
         List {
             ForEach(viewModel.notes) { note in
                 NavigationLink {
-                    NoteEditorView(viewModel: NoteEditorViewModel(noteID: note.id, repository: viewModel.repository))
+                    NoteEditorView(
+                        viewModel: NoteEditorViewModel(
+                            noteID: note.id,
+                            repository: viewModel.repository,
+                            widgetBridge: viewModel.widgetBridge
+                        )
+                    )
                 } label: {
                     VStack(alignment: .leading, spacing: 4) {
                         HStack(spacing: 6) {

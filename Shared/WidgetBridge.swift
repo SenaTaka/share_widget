@@ -10,20 +10,31 @@ public enum WidgetBridge {
     public static let widgetKind = "share_widgetWidget"
     public static let urlScheme = "sharewidget"
 
+    private static var snapshotFileURL: URL? {
+        FileManager.default
+            .containerURL(forSecurityApplicationGroupIdentifier: appGroupID)?
+            .appendingPathComponent("widget_note_snapshot.json")
+    }
+
     public static func loadSnapshot() -> WidgetNoteSnapshot? {
-        guard let defaults = UserDefaults(suiteName: appGroupID),
-              let data = defaults.data(forKey: snapshotKey) else {
+        guard let snapshotFileURL,
+              let data = try? Data(contentsOf: snapshotFileURL) else {
             return nil
         }
         return try? JSONDecoder().decode(WidgetNoteSnapshot.self, from: data)
     }
 
     public static func saveSnapshot(_ snapshot: WidgetNoteSnapshot) {
-        guard let defaults = UserDefaults(suiteName: appGroupID),
+        guard let snapshotFileURL,
               let data = try? JSONEncoder().encode(snapshot) else {
             return
         }
-        defaults.set(data, forKey: snapshotKey)
+        try? data.write(to: snapshotFileURL, options: .atomic)
+
+        // Backward-compatible cache key in case older builds still read via UserDefaults.
+        if let defaults = UserDefaults(suiteName: appGroupID) {
+            defaults.set(data, forKey: snapshotKey)
+        }
     }
 
     public static func saveSnapshotAndReload(_ snapshot: WidgetNoteSnapshot) {
@@ -33,15 +44,12 @@ public enum WidgetBridge {
         #endif
     }
 
-    public static func makeWidgetURL(noteID: UUID) -> URL {
+    public static func makeWidgetURL(noteID: UUID) -> URL? {
         var components = URLComponents()
         components.scheme = urlScheme
         components.host = "note"
         components.queryItems = [URLQueryItem(name: "noteID", value: noteID.uuidString)]
-        if let url = components.url {
-            return url
-        }
-        return URL(fileURLWithPath: "/")
+        return components.url
     }
 
     public static func parseNoteID(from url: URL) -> UUID? {

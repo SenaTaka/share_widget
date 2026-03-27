@@ -1,17 +1,12 @@
-//
-//  share_widgetApp.swift
-//  share_widget
-//
-//  Created by Sena Takasawa on 2026/3/27.
-//
-
 import SwiftUI
 
 @main
 struct share_widgetApp: App {
+    private let compositionRoot = AppCompositionRoot.makeDefault()
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView(viewModelFactory: compositionRoot.makeWorkspaceListViewModel)
         }
     }
 }

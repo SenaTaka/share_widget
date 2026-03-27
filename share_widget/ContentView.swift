@@ -1,24 +1,19 @@
-//
-//  ContentView.swift
-//  share_widget
-//
-//  Created by Sena Takasawa on 2026/3/27.
-//
-
 import SwiftUI
 
 struct ContentView: View {
+    private let viewModelFactory: () -> WorkspaceListViewModel
+
+    init(viewModelFactory: @escaping () -> WorkspaceListViewModel) {
+        self.viewModelFactory = viewModelFactory
+    }
+
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
-        }
-        .padding()
+        WorkspaceListScreen(viewModel: viewModelFactory())
     }
 }
 
 #Preview {
-    ContentView()
+    ContentView(viewModelFactory: {
+        WorkspaceListViewModel(workspaceRepository: InMemoryWorkspaceRepository())
+    })
 }

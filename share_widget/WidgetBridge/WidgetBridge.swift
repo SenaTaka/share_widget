@@ -83,12 +83,12 @@ actor AppGroupWidgetBridge: WidgetBridge {
             return UIImage(systemName: "square.and.pencil")?.pngData() ?? Data()
         }
 
-        let targetSize = CGSize(width: 320, height: 200)
-        let image = drawing.image(from: drawing.bounds, scale: 2)
+        let targetSize = CGSize(width: 150, height: 100)
+        let image = drawing.image(from: drawing.bounds, scale: 1)
         let renderer = UIGraphicsImageRenderer(size: targetSize)
 
-        return renderer.pngData { context in
-            UIColor.systemBackground.setFill()
+        return renderer.jpegData(withCompressionQuality: 0.7) { context in
+            UIColor.white.setFill()
             context.fill(CGRect(origin: .zero, size: targetSize))
 
             let aspectRatio = min(

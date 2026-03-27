@@ -40,7 +40,16 @@ struct Provider: TimelineProvider {
             return nil
         }
         
-        let thumbnailImage = UIImage(contentsOfFile: thumbnailURL.path)
+        var thumbnailImage: UIImage? = nil
+        if let image = UIImage(contentsOfFile: thumbnailURL.path) {
+            let maxSize: CGFloat = 150
+            let scale = min(maxSize / image.size.width, maxSize / image.size.height, 1.0)
+            let newSize = CGSize(width: image.size.width * scale, height: image.size.height * scale)
+            UIGraphicsBeginImageContextWithOptions(newSize, false, 1.0)
+            image.draw(in: CGRect(origin: .zero, size: newSize))
+            thumbnailImage = UIGraphicsGetImageFromCurrentImageContext()
+            UIGraphicsEndImageContext()
+        }
         
         return NoteEntry(
             date: manifest.updatedAt,

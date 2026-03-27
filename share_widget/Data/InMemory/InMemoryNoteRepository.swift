@@ -42,12 +42,32 @@ actor InMemoryNoteRepository: NoteRepository {
         return notes[index]
     }
 
+    func pinNoteToWidget(noteID: UUID) async throws -> Note {
+        guard notes.contains(where: { $0.id == noteID }) else {
+            throw RepositoryError.noteNotFound
+        }
+
+        for index in notes.indices {
+            notes[index].isPinnedToWidget = notes[index].id == noteID
+        }
+
+        guard let pinnedIndex = notes.firstIndex(where: { $0.id == noteID }) else {
+            throw RepositoryError.noteNotFound
+        }
+        notes[pinnedIndex].updatedAt = Date()
+        return notes[pinnedIndex]
+    }
+
     func delete(noteID: UUID) async throws {
         notes.removeAll(where: { $0.id == noteID })
     }
 
     func fetchNote(noteID: UUID) async throws -> Note? {
         notes.first(where: { $0.id == noteID })
+    }
+
+    func fetchPinnedNote() async throws -> Note? {
+        notes.first(where: \.isPinnedToWidget)
     }
 }
 

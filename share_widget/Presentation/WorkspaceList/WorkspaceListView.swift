@@ -10,12 +10,28 @@ struct WorkspaceListView: View {
                     NoteEditorView(viewModel: NoteEditorViewModel(noteID: note.id, repository: viewModel.repository))
                 } label: {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(note.title)
-                            .font(.headline)
+                        HStack(spacing: 6) {
+                            Text(note.title)
+                                .font(.headline)
+                            if note.isPinnedToWidget {
+                                Image(systemName: "pin.fill")
+                                    .font(.caption)
+                                    .foregroundStyle(.yellow)
+                                    .accessibilityLabel("Pinned to widget")
+                            }
+                        }
                         Text(note.updatedAt, style: .relative)
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
+                }
+                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                    Button {
+                        viewModel.pinToWidget(noteID: note.id)
+                    } label: {
+                        Label("Pin", systemImage: "pin")
+                    }
+                    .tint(.yellow)
                 }
             }
             .onDelete(perform: viewModel.deleteNotes)

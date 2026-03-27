@@ -24,6 +24,23 @@ actor InMemoryNoteRepository: NoteRepository {
         return note
     }
 
+    func createPhotoMessageEntry(
+        title: String,
+        photoReference: String,
+        messageText: String,
+        authorUserID: String
+    ) async throws -> Note {
+        let note = Note(
+            title: title,
+            entryType: .photoMessage,
+            photoReference: photoReference,
+            messageText: messageText,
+            authorUserID: authorUserID
+        )
+        notes.append(note)
+        return note
+    }
+
     func updateTitle(noteID: UUID, title: String) async throws -> Note {
         guard let index = notes.firstIndex(where: { $0.id == noteID }) else {
             throw RepositoryError.noteNotFound
@@ -33,11 +50,43 @@ actor InMemoryNoteRepository: NoteRepository {
         return notes[index]
     }
 
+    func updateMessage(noteID: UUID, messageText: String) async throws -> Note {
+        guard let index = notes.firstIndex(where: { $0.id == noteID }) else {
+            throw RepositoryError.noteNotFound
+        }
+        notes[index].entryType = .photoMessage
+        notes[index].messageText = messageText
+        notes[index].updatedAt = Date()
+        return notes[index]
+    }
+
+
+    func updatePhotoMessageEntry(
+        noteID: UUID,
+        title: String,
+        photoReference: String,
+        messageText: String,
+        authorUserID: String
+    ) async throws -> Note {
+        guard let index = notes.firstIndex(where: { $0.id == noteID }) else {
+            throw RepositoryError.noteNotFound
+        }
+
+        notes[index].title = title
+        notes[index].entryType = .photoMessage
+        notes[index].photoReference = photoReference
+        notes[index].messageText = messageText
+        notes[index].authorUserID = authorUserID
+        notes[index].updatedAt = Date()
+        return notes[index]
+    }
+
     func saveDrawing(noteID: UUID, drawingData: Data) async throws -> Note {
         guard let index = notes.firstIndex(where: { $0.id == noteID }) else {
             throw RepositoryError.noteNotFound
         }
         notes[index].drawingData = drawingData
+        notes[index].entryType = .handwriting
         notes[index].updatedAt = Date()
         return notes[index]
     }

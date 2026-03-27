@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct WorkspaceListView: View {
-    @StateObject var viewModel: WorkspaceListViewModel
+    @StateObject var viewModel: NoteListViewModel
 
     var body: some View {
         List {

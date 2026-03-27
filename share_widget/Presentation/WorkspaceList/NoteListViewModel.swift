@@ -1,7 +1,7 @@
 import Foundation
 
 @MainActor
-final class WorkspaceListViewModel: ObservableObject {
+final class NoteListViewModel: ObservableObject {
     @Published private(set) var notes: [Note] = []
     @Published var errorMessage: String?
 

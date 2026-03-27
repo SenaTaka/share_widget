@@ -233,20 +233,39 @@ xcodebuild clean -scheme share_widget
 - App Group integration for data sharing
 - Widget refresh on note changes
 
-### Planned Features
+### New Features (v0.2 - Phase 2)
 
-#### 🔄 Workspace Management
-- Create and edit workspaces
-- Archive workspaces
-- Separate workspace list view
+#### ✅ Workspace Management
+- Create, edit, and delete workspaces
+- Archive/unarchive workspaces
+- View workspace members and sharing status
 - Organize notes by workspace
+- Last updated timestamps
 
-#### 🤝 Collaboration
-- Share workspace invitations
-- Accept/decline invitations
-- Real-time synchronization across devices
-- Conflict resolution UI (reload vs. overwrite)
-- Member management
+#### ✅ Collaboration Features
+- Share workspace invitations with permission levels (Owner, Read/Write, Read Only)
+- Generate unique invitation codes (7-day expiration)
+- Accept/decline workspace invitations
+- View active invitation status
+- Revoke pending invitations
+- Member management with permissions
+
+#### ✅ Conflict Resolution
+- Detect editing conflicts between users
+- Side-by-side version comparison UI
+- View version metadata (author, timestamp, revision)
+- Drawing preview for both versions
+- Choose to keep local or remote version
+- Cancel conflict resolution
+
+#### ✅ Synchronization Infrastructure
+- Mock sync service for testing
+- Remote change event system
+- Workspace and note sync operations
+- Conflict detection (10% random for testing)
+- Start/stop sync controls
+
+### Planned Features (Phase 3)
 
 #### 🎨 Advanced Features
 - Stroke-level synchronization
@@ -254,7 +273,7 @@ xcodebuild clean -scheme share_widget
 - Note history and undo/redo
 - Handwriting search
 - Multiple widget configurations
-- Fine-grained permission controls
+- Real backend integration (CloudKit/custom API)
 
 ---
 
@@ -308,6 +327,7 @@ Contributions are welcome! Please follow these guidelines:
 ## 📄 Documentation
 
 - **Design Document**: See [todo.txt](./todo.txt) for comprehensive design specifications (Japanese)
+- **Workspace CRUD Implementation**: See [docs/workspace_crud_implementation.md](./docs/workspace_crud_implementation.md) for Phase 2 features
 - **Compatibility**: See [docs/compatibility.md](./docs/compatibility.md) for iOS version compatibility
 - **Progress**: See [docs/progress_checklist.md](./docs/progress_checklist.md) for implementation status
 
@@ -324,25 +344,27 @@ Contributions are welcome! Please follow these guidelines:
 
 ## 📈 Roadmap
 
-### Phase 1 (Current - MVP)
+### Phase 1 - MVP ✅
 - [x] Note CRUD operations
 - [x] PencilKit drawing integration
 - [x] Autosave mechanism
 - [x] Widget pin/unpin functionality
 - [x] Widget cache generation
 
-### Phase 2 (Next)
-- [ ] Workspace CRUD and management
-- [ ] Share invitation flow
-- [ ] Conflict resolution UI
-- [ ] Real synchronization implementation
+### Phase 2 - Collaboration Foundation ✅
+- [x] Workspace CRUD and management
+- [x] Share invitation flow
+- [x] Conflict resolution UI
+- [x] Mock synchronization implementation
 
-### Phase 3 (Future)
+### Phase 3 - Future Enhancements
+- [ ] Real backend integration (CloudKit or custom API)
 - [ ] Stroke-level synchronization
 - [ ] Comments and annotations
-- [ ] Note history
+- [ ] Note history and version control
 - [ ] Advanced widget configurations
 - [ ] Fine-grained permissions
+- [ ] Offline mode improvements
 
 ---
 

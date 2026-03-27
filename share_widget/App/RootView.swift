@@ -5,7 +5,12 @@ struct RootView: View {
 
     var body: some View {
         NavigationStack {
-            WorkspaceListView(viewModel: WorkspaceListViewModel(repository: dependencies.noteRepository))
+            WorkspaceListView(
+                viewModel: WorkspaceListViewModel(
+                    repository: dependencies.noteRepository,
+                    widgetBridge: dependencies.widgetBridge
+                )
+            )
         }
     }
 }

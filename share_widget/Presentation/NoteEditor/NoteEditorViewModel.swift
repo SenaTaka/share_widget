@@ -10,13 +10,15 @@ final class NoteEditorViewModel: ObservableObject {
     private let noteID: UUID
     private let repository: NoteRepository
     private let saveDrawingUseCase: SaveDrawingUseCase
+    private let refreshWidgetUseCase: RefreshWidgetUseCase
 
     private var saveTask: Task<Void, Never>?
 
-    init(noteID: UUID, repository: NoteRepository) {
+    init(noteID: UUID, repository: NoteRepository, widgetBridge: WidgetBridge) {
         self.noteID = noteID
         self.repository = repository
         self.saveDrawingUseCase = SaveDrawingUseCase(repository: repository)
+        self.refreshWidgetUseCase = RefreshWidgetUseCase(repository: repository, widgetBridge: widgetBridge)
     }
 
     func load() {
@@ -41,6 +43,7 @@ final class NoteEditorViewModel: ObservableObject {
         Task {
             do {
                 _ = try await repository.updateTitle(noteID: noteID, title: title)
+                await refreshWidgetUseCase.execute()
             } catch {
                 syncState = .error(error.localizedDescription)
             }
@@ -72,6 +75,7 @@ final class NoteEditorViewModel: ObservableObject {
             let data = drawing.dataRepresentation()
             let note = try await saveDrawingUseCase.execute(noteID: noteID, drawingData: data)
             syncState = .synced(note.updatedAt)
+            await refreshWidgetUseCase.execute()
         } catch {
             syncState = .error(error.localizedDescription)
         }

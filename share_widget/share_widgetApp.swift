@@ -2,11 +2,12 @@ import SwiftUI
 
 @main
 struct share_widgetApp: App {
-    private let compositionRoot = AppCompositionRoot.makeDefault()
+    @StateObject private var dependencies = AppDependencies()
 
     var body: some Scene {
         WindowGroup {
-            ContentView(viewModelFactory: compositionRoot.makeWorkspaceListViewModel)
+            ContentView()
+                .environmentObject(dependencies)
         }
     }
 }

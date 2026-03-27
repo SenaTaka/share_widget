@@ -1,17 +1,15 @@
-//
-//  share_widgetApp.swift
-//  share_widget
-//
-//  Created by Sena Takasawa on 2026/3/27.
-//
-
 import SwiftUI
 
 @main
 struct share_widgetApp: App {
+    @State private var routedNoteID: UUID?
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView(routedNoteID: $routedNoteID)
+                .onOpenURL { url in
+                    routedNoteID = WidgetBridge.parseNoteID(from: url)
+                }
         }
     }
 }

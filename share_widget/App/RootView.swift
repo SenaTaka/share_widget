@@ -7,7 +7,9 @@ struct RootView: View {
         WorkspaceListScreen(
             viewModel: WorkspaceListViewModel(
                 workspaceRepository: dependencies.workspaceRepository
-            )
+            ),
+            noteRepository: dependencies.noteRepository,
+            widgetBridge: dependencies.widgetBridge
         )
     }
 }

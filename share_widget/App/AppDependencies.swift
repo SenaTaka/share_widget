@@ -10,7 +10,7 @@ final class AppDependencies: ObservableObject {
     init(
         workspaceRepository: WorkspaceRepository = InMemoryWorkspaceRepository(),
         noteRepository: NoteRepository = InMemoryNoteRepository(),
-        widgetBridge: WidgetBridge = LiveWidgetBridge()
+        widgetBridge: WidgetBridge = AppGroupWidgetBridge()
     ) {
         self.workspaceRepository = workspaceRepository
         self.noteRepository = noteRepository

@@ -15,8 +15,9 @@ struct PencilCanvasView: UIViewRepresentable {
         canvas.drawing = drawing
         canvas.alwaysBounceVertical = true
         canvas.drawingPolicy = .anyInput
-        canvas.backgroundColor = .systemBackground
-        canvas.tool = PKInkingTool(.pen, color: .label, width: 5)
+        canvas.backgroundColor = .white
+        canvas.overrideUserInterfaceStyle = .light
+        canvas.tool = PKInkingTool(.pen, color: .black, width: 5)
         return canvas
     }
 

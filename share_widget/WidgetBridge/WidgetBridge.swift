@@ -104,3 +104,7 @@ actor AppGroupWidgetBridge: WidgetBridge {
         }
     }
 }
+
+struct WidgetBridgeNoop: WidgetBridge {
+    func syncPinnedNote(_ note: Note?) async {}
+}

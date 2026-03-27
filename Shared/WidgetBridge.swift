@@ -38,7 +38,10 @@ public enum WidgetBridge {
         components.scheme = urlScheme
         components.host = "note"
         components.queryItems = [URLQueryItem(name: "noteID", value: noteID.uuidString)]
-        return components.url ?? URL(string: "\(urlScheme)://note")!
+        if let url = components.url {
+            return url
+        }
+        return URL(fileURLWithPath: "/")
     }
 
     public static func parseNoteID(from url: URL) -> UUID? {

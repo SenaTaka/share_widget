@@ -9,9 +9,7 @@ struct Note: Identifiable, Equatable {
 struct ContentView: View {
     @Binding var routedNoteID: UUID?
 
-    @State private var notes: [Note] = [
-        Note(id: WidgetNoteSnapshot.dummy.noteID, title: WidgetNoteSnapshot.dummy.title, body: WidgetNoteSnapshot.dummy.body)
-    ]
+    @State private var notes: [Note] = []
     @State private var titleInput = ""
     @State private var bodyInput = ""
 
@@ -66,6 +64,21 @@ struct ContentView: View {
             }
             .padding()
             .navigationTitle("share_widget")
+            .onAppear {
+                guard notes.isEmpty else { return }
+                if let stored = WidgetBridge.loadSnapshot() {
+                    notes = [Note(id: stored.noteID, title: stored.title, body: stored.body)]
+                    return
+                }
+
+                notes = [
+                    Note(
+                        id: WidgetNoteSnapshot.dummy.noteID,
+                        title: WidgetNoteSnapshot.dummy.title,
+                        body: WidgetNoteSnapshot.dummy.body
+                    )
+                ]
+            }
         }
     }
 

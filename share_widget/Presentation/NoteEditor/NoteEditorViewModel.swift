@@ -7,6 +7,10 @@ final class NoteEditorViewModel: ObservableObject {
     @Published var title: String = ""
     @Published var syncState: SyncState = .idle
     @Published var drawing: PKDrawing = PKDrawing()
+    @Published var selectedEntryType: NoteEntryType = .handwriting
+    @Published var messageText: String = ""
+    @Published var authorUserID: String = ""
+    @Published var photoReference: String?
 
     private let noteID: UUID
     private let repository: NoteRepository
@@ -30,6 +34,10 @@ final class NoteEditorViewModel: ObservableObject {
                     return
                 }
                 title = note.title
+                selectedEntryType = note.entryType
+                messageText = note.messageText ?? ""
+                authorUserID = note.authorUserID ?? ""
+                photoReference = note.photoReference
                 if let restored = try? PKDrawing(data: note.drawingData) {
                     drawing = restored
                 }
@@ -58,9 +66,29 @@ final class NoteEditorViewModel: ObservableObject {
         }
     }
 
+    func setSelectedPhotoData(_ data: Data?) {
+        guard let data else {
+            photoReference = nil
+            return
+        }
+        photoReference = "data:image/jpeg;base64,\(data.base64EncodedString())"
+    }
+
+    func savePhotoMessage() {
+        Task {
+            await persistPhotoMessage()
+        }
+    }
+
     func forceSaveBeforeExit() {
         saveTask?.cancel()
-        saveTask = Task { await saveDrawing() }
+        saveTask = Task {
+            if selectedEntryType == .handwriting {
+                await saveDrawing()
+            } else {
+                await persistPhotoMessage()
+            }
+        }
     }
 
     private func scheduleSave() {
@@ -77,6 +105,28 @@ final class NoteEditorViewModel: ObservableObject {
         do {
             let data = drawing.dataRepresentation()
             let note = try await saveDrawingUseCase.execute(noteID: noteID, drawingData: data)
+            syncState = .synced(note.updatedAt)
+            await refreshWidgetUseCase.execute()
+        } catch {
+            syncState = .error(error.localizedDescription)
+        }
+    }
+
+    private func persistPhotoMessage() async {
+        syncState = .saving
+        do {
+            guard let photoReference, !photoReference.isEmpty else {
+                syncState = .error("Please select a photo")
+                return
+            }
+
+            let note = try await repository.updatePhotoMessageEntry(
+                noteID: noteID,
+                title: title,
+                photoReference: photoReference,
+                messageText: messageText,
+                authorUserID: authorUserID
+            )
             syncState = .synced(note.updatedAt)
             await refreshWidgetUseCase.execute()
         } catch {

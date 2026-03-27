@@ -6,6 +6,7 @@ import WidgetKit
 struct WidgetPinnedNoteManifest: Codable {
     let noteID: UUID
     let title: String
+    let entryType: NoteEntryType
     let updatedAt: Date
     let thumbnailFileName: String
 }
@@ -50,13 +51,14 @@ actor AppGroupWidgetBridge: WidgetBridge {
             return
         }
 
-        let thumbnailData = renderThumbnailData(from: note.drawingData)
+        let thumbnailData = renderThumbnailData(for: note)
         do {
             try thumbnailData.write(to: thumbnailURL, options: .atomic)
 
             let manifest = WidgetPinnedNoteManifest(
                 noteID: note.id,
                 title: note.title,
+                entryType: note.entryType,
                 updatedAt: note.updatedAt,
                 thumbnailFileName: thumbnailURL.lastPathComponent
             )
@@ -78,13 +80,38 @@ actor AppGroupWidgetBridge: WidgetBridge {
             .appendingPathComponent("WidgetBridgeFallback", isDirectory: true)
     }
 
-    private func renderThumbnailData(from drawingData: Data) -> Data {
+    private func renderThumbnailData(for note: Note) -> Data {
+        switch note.entryType {
+        case .handwriting:
+            return renderDrawingThumbnailData(from: note.drawingData)
+        case .photoMessage:
+            if let imageData = imageDataFromReference(note.photoReference),
+               let image = UIImage(data: imageData) {
+                return renderImageThumbnailData(image)
+            }
+            return UIImage(systemName: "photo")?.pngData() ?? Data()
+        }
+    }
+
+    private func imageDataFromReference(_ photoReference: String?) -> Data? {
+        guard let photoReference, let separatorRange = photoReference.range(of: "base64,") else {
+            return nil
+        }
+        let base64String = String(photoReference[separatorRange.upperBound...])
+        return Data(base64Encoded: base64String)
+    }
+
+    private func renderDrawingThumbnailData(from drawingData: Data) -> Data {
         guard let drawing = try? PKDrawing(data: drawingData), !drawing.bounds.isNull, !drawing.bounds.isEmpty else {
             return UIImage(systemName: "square.and.pencil")?.pngData() ?? Data()
         }
 
         let targetSize = CGSize(width: 150, height: 100)
         let image = drawing.image(from: drawing.bounds, scale: 1)
+        return renderImageThumbnailData(image, targetSize: targetSize)
+    }
+
+    private func renderImageThumbnailData(_ image: UIImage, targetSize: CGSize = CGSize(width: 150, height: 100)) -> Data {
         let renderer = UIGraphicsImageRenderer(size: targetSize)
 
         return renderer.jpegData(withCompressionQuality: 0.7) { context in

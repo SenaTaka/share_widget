@@ -12,5 +12,6 @@ import SwiftUI
 struct share_widget_widBundle: WidgetBundle {
     var body: some Widget {
         share_widget_wid()
+        share_widget_lockscreen()
     }
 }

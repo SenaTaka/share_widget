@@ -64,13 +64,13 @@ struct WorkspaceListScreen: View {
                     }
                 }
             }
-            .navigationTitle("Workspaces")
+            .navigationTitle("フォルダ")
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     Button {
                         showingCreateDialog = true
                     } label: {
-                        Image(systemName: "plus")
+                        Label("新規フォルダ", systemImage: "folder.badge.plus")
                     }
                 }
             }
@@ -126,33 +126,34 @@ struct WorkspaceRow: View {
     let workspace: Workspace
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack {
+        HStack(spacing: 12) {
+            Image(systemName: "folder.fill")
+                .font(.title2)
+                .foregroundStyle(.yellow)
+                .frame(width: 32)
+            
+            VStack(alignment: .leading, spacing: 4) {
                 Text(workspace.name)
                     .font(.headline)
-
-                Spacer()
-
-                if workspace.isShared {
-                    Image(systemName: "person.2.fill")
-                        .font(.caption)
-                        .foregroundStyle(.blue)
-                }
-            }
-
-            HStack {
-                Text("Updated \(workspace.updatedAt, style: .relative) ago")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-
-                Spacer()
-
-                if workspace.members.count > 1 {
-                    Text("\(workspace.members.count) members")
+                
+                HStack(spacing: 8) {
+                    Text(workspace.updatedAt, style: .relative)
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                    
+                    if workspace.isShared {
+                        Label("\(workspace.members.count)人", systemImage: "person.2.fill")
+                            .font(.caption)
+                            .foregroundStyle(.blue)
+                    }
                 }
             }
+            
+            Spacer()
+            
+            Image(systemName: "chevron.right")
+                .font(.caption)
+                .foregroundStyle(.secondary)
         }
         .padding(.vertical, 4)
     }

@@ -37,8 +37,10 @@ struct PencilCanvasView: UIViewRepresentable {
         }
 
         func canvasViewDrawingDidChange(_ canvasView: PKCanvasView) {
-            drawing = canvasView.drawing
-            onChanged(canvasView.drawing)
+            DispatchQueue.main.async { [weak self] in
+                self?.drawing = canvasView.drawing
+                self?.onChanged(canvasView.drawing)
+            }
         }
     }
 }

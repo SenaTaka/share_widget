@@ -15,38 +15,50 @@ struct WorkspaceListView: View {
                         )
                     )
                 } label: {
-                    VStack(alignment: .leading, spacing: 4) {
-                        HStack(spacing: 6) {
+                    HStack(spacing: 12) {
+                        Image(systemName: "doc.richtext")
+                            .font(.title2)
+                            .foregroundStyle(.blue)
+                            .frame(width: 32)
+                        
+                        VStack(alignment: .leading, spacing: 4) {
                             Text(note.title)
                                 .font(.headline)
-                            if note.isPinnedToWidget {
-                                Image(systemName: "pin.fill")
-                                    .font(.caption)
-                                    .foregroundStyle(.yellow)
-                                    .accessibilityLabel("Pinned to widget")
-                            }
+                            Text(note.updatedAt, style: .relative)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
                         }
-                        Text(note.updatedAt, style: .relative)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                        
+                        Spacer()
+                        
+                        if note.isPinnedToWidget {
+                            Label("Widget", systemImage: "rectangle.on.rectangle")
+                                .font(.caption2)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(.yellow.opacity(0.2))
+                                .foregroundStyle(.orange)
+                                .cornerRadius(8)
+                        }
                     }
+                    .padding(.vertical, 4)
                 }
-                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                     Button {
                         viewModel.pinToWidget(noteID: note.id)
                     } label: {
-                        Label("Pin", systemImage: "pin")
+                        Label("ウィジェットに表示", systemImage: "rectangle.on.rectangle")
                     }
-                    .tint(.yellow)
+                    .tint(.orange)
                 }
             }
             .onDelete(perform: viewModel.deleteNotes)
         }
-        .navigationTitle("Shared Notes")
+        .navigationTitle("メモ一覧")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button(action: viewModel.createNote) {
-                    Label("New Note", systemImage: "plus")
+                    Label("新規メモ", systemImage: "square.and.pencil")
                 }
             }
         }

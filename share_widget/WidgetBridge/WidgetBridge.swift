@@ -20,7 +20,7 @@ actor AppGroupWidgetBridge: WidgetBridge {
     private let encoder: JSONEncoder
 
     init(
-        appGroupID: String = "group.com.example.share_widget",
+        appGroupID: String = "group.com.sena.share.wid",
         fileManager: FileManager = .default,
         encoder: JSONEncoder = JSONEncoder()
     ) {

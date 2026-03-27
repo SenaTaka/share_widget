@@ -52,8 +52,10 @@ final class NoteEditorViewModel: ObservableObject {
     }
 
     func drawingDidChange(_ updated: PKDrawing) {
-        drawing = updated
-        scheduleSave()
+        Task { @MainActor in
+            drawing = updated
+            scheduleSave()
+        }
     }
 
     func forceSaveBeforeExit() {

@@ -9,7 +9,7 @@ import WidgetKit
 import SwiftUI
 
 struct Provider: TimelineProvider {
-    private let appGroupID = "group.com.example.share_widget"
+    private let appGroupID = "group.com.sena.share.wid"
     
     func placeholder(in context: Context) -> NoteEntry {
         NoteEntry(date: Date(), title: "Note Title", thumbnail: nil)
@@ -79,29 +79,63 @@ struct share_widget_widEntryView: View {
     @Environment(\.widgetFamily) var family
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(entry.title)
-                .font(.headline)
-                .lineLimit(1)
-            
-            if let thumbnail = entry.thumbnail {
-                Image(uiImage: thumbnail)
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .cornerRadius(8)
-            } else {
-                Image(systemName: "square.and.pencil")
-                    .font(.largeTitle)
-                    .foregroundStyle(.secondary)
+        GeometryReader { geometry in
+            VStack(alignment: .leading, spacing: 0) {
+                if let thumbnail = entry.thumbnail {
+                    Image(uiImage: thumbnail)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    VStack {
+                        Image(systemName: "square.and.pencil")
+                            .font(.system(size: iconSize))
+                            .foregroundStyle(.secondary)
+                        Text(entry.title)
+                            .font(titleFont)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
+                    }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
+                
+                if family != .systemSmall {
+                    HStack {
+                        Text(entry.title)
+                            .font(titleFont)
+                            .fontWeight(.semibold)
+                            .lineLimit(1)
+                        Spacer()
+                        Text(entry.date, style: .relative)
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(.top, 8)
+                }
             }
-            
-            Text(entry.date, style: .relative)
-                .font(.caption2)
-                .foregroundStyle(.secondary)
+            .padding(family == .systemSmall ? 8 : 12)
         }
-        .padding()
         .containerBackground(.fill.tertiary, for: .widget)
+    }
+    
+    private var iconSize: CGFloat {
+        switch family {
+        case .systemSmall: return 32
+        case .systemMedium: return 40
+        case .systemLarge: return 48
+        case .systemExtraLarge: return 56
+        default: return 40
+        }
+    }
+    
+    private var titleFont: Font {
+        switch family {
+        case .systemSmall: return .caption
+        case .systemMedium: return .subheadline
+        case .systemLarge: return .headline
+        case .systemExtraLarge: return .title3
+        default: return .subheadline
+        }
     }
 }
 
@@ -112,9 +146,75 @@ struct share_widget_wid: Widget {
         StaticConfiguration(kind: kind, provider: Provider()) { entry in
             share_widget_widEntryView(entry: entry)
         }
-        .configurationDisplayName("Pinned Note")
-        .description("Display your pinned handwritten note.")
-        .supportedFamilies([.systemSmall, .systemMedium])
+        .configurationDisplayName("手書きメモ")
+        .description("ピン留めした手書きメモを表示")
+        .supportedFamilies([.systemSmall, .systemMedium, .systemLarge, .systemExtraLarge])
+    }
+}
+
+// ロック画面用ウィジェット
+struct share_widget_lockscreen: Widget {
+    let kind: String = "share_widget_lockscreen"
+
+    var body: some WidgetConfiguration {
+        StaticConfiguration(kind: kind, provider: Provider()) { entry in
+            LockScreenWidgetEntryView(entry: entry)
+        }
+        .configurationDisplayName("手書きメモ")
+        .description("ロック画面にメモを表示")
+        .supportedFamilies([.accessoryCircular, .accessoryRectangular, .accessoryInline])
+    }
+}
+
+struct LockScreenWidgetEntryView: View {
+    var entry: Provider.Entry
+    @Environment(\.widgetFamily) var family
+
+    var body: some View {
+        Group {
+            switch family {
+            case .accessoryCircular:
+                ZStack {
+                    AccessoryWidgetBackground()
+                    if let thumbnail = entry.thumbnail {
+                        Image(uiImage: thumbnail)
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .clipShape(Circle())
+                    } else {
+                        Image(systemName: "square.and.pencil")
+                            .font(.title2)
+                    }
+                }
+            case .accessoryRectangular:
+                HStack(spacing: 8) {
+                    if let thumbnail = entry.thumbnail {
+                        Image(uiImage: thumbnail)
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 40)
+                            .cornerRadius(4)
+                    } else {
+                        Image(systemName: "square.and.pencil")
+                            .font(.title2)
+                            .frame(width: 40)
+                    }
+                    VStack(alignment: .leading) {
+                        Text(entry.title)
+                            .font(.headline)
+                            .lineLimit(1)
+                        Text(entry.date, style: .relative)
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            case .accessoryInline:
+                Label(entry.title, systemImage: "square.and.pencil")
+            default:
+                EmptyView()
+            }
+        }
+        .containerBackground(.clear, for: .widget)
     }
 }
 

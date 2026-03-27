@@ -40,8 +40,12 @@ private struct SyncStateBadge: View {
             return "Idle"
         case .saving:
             return "Saving..."
+        case .syncing:
+            return "Syncing..."
         case .synced(let date):
             return "Synced \(date.formatted(date: .omitted, time: .shortened))"
+        case .conflict:
+            return "Conflict"
         case .error(let message):
             return "Error: \(message)"
         }

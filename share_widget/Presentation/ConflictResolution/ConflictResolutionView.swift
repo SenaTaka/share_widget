@@ -126,7 +126,7 @@ struct VersionCard: View {
 
                     InfoLabel(
                         icon: "clock",
-                        text: "Updated \(version.updatedAt, style: .relative) ago"
+                        text: "Updated \(version.updatedAt.formatted(date: .abbreviated, time: .shortened))"
                     )
 
                     InfoLabel(

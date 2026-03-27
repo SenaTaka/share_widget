@@ -1,15 +1,11 @@
 import Foundation
+import Combine
 
 @MainActor
 final class AppDependencies: ObservableObject {
-    let noteRepository: NoteRepository
-    let widgetBridge: WidgetBridge
+    let workspaceRepository: WorkspaceRepository
 
-    init(
-        noteRepository: NoteRepository = InMemoryNoteRepository(),
-        widgetBridge: WidgetBridge = AppGroupWidgetBridge()
-    ) {
-        self.noteRepository = noteRepository
-        self.widgetBridge = widgetBridge
+    init(workspaceRepository: WorkspaceRepository = InMemoryWorkspaceRepository()) {
+        self.workspaceRepository = workspaceRepository
     }
 }
